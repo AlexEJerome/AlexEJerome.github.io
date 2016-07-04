@@ -10,8 +10,7 @@ title: Alex Jerome
 email: ""
 description: > # this means to ignore newlines until "baseurl:"
  I'm a Marketing major and a Computer Science minor at the University of Maryland, College Park.
- I'm known for my work at <a href="http://RedBlackConsulting.com">RedBlack Consulting</a> and 
- <a href="http://bitca.mp">Bitcamp</a>.
+ I'm known for my work at R2integrated, Mindgrub, RedBlack Consulting and Bitcamp.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://alexejero.me" # the base hostname & protocol for your site
 twitter_username: AlexEJerome
