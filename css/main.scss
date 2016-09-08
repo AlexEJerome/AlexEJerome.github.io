@@ -6,7 +6,8 @@
 
 
 // Our variables
-$base-font-family: "Raleway" ,"Helvetica Neue", Helvetica, Arial, sans-serif;
+$title-font-family: "Raleway" ,"Helvetica Neue", Helvetica, Arial, sans-serif;
+$base-font-family: "Roboto" ,"Helvetica Neue", Helvetica, Arial, sans-serif;
 $base-font-size:   18px;
 $base-font-weight: 400;
 $small-font-size:  $base-font-size * 0.875;
@@ -29,6 +30,11 @@ $on-palm:          600px;
 $on-laptop:        800px;
 
 
+// custom colors
+$a-default-color: #1B268A;
+$big-blue:#202DAC;
+$bg-light:#EEF0FF;
+
 
 // Use media queries like this:
 // @include media-query($on-palm) {
@@ -49,5 +55,7 @@ $on-laptop:        800px;
 @import
         "base",
         "layout",
-        "syntax-highlighting"
+        "syntax-highlighting",
+        "neat/neat",
+        "custom"
 ;

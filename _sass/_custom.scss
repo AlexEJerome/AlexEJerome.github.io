@@ -1,0 +1,31 @@
+/* Custom SCSS */
+a{
+	font-family: $title-font-family;
+	font-weight: 700;
+	color:$a-default-color;
+	font-size: 24px;
+	text-transform: capitalize;
+	&:visited{
+		color:$a-default-color;
+	}
+
+}
+.quote-attr{
+	font-size: 30px;
+	color: $big-blue;
+}
+blockquote.quote-hero{
+	background-color: $bg-light;
+	color: $big-blue;
+	border: none;
+	margin: 0;
+	padding: 0;
+	font-weight: 400;
+	font-size: 36px;
+	font-style: normal;;
+}
+.button-main{
+	background-color: $bg-light;
+	padding: 18px;
+	margin-right: 18px;
+}
