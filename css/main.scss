@@ -15,9 +15,16 @@ $base-line-height: 1.5;
 
 $spacing-unit:     30px;
 
+// custom colors
+$dark-blue: #1B268A;
+$med-light-blue:#CAD0FF;
+$light-blue:#EEF0FF;
+
+$orange: #FFA32F;
+
 $text-color:       #111;
 $background-color: #fdfdfd;
-$brand-color:      #2a7ae2;
+$brand-color:      $dark-blue;
 
 $grey-color:       #828282;
 $grey-color-light: lighten($grey-color, 40%);
@@ -30,10 +37,6 @@ $on-palm:          600px;
 $on-laptop:        800px;
 
 
-// custom colors
-$a-default-color: #1B268A;
-$big-blue:#202DAC;
-$bg-light:#EEF0FF;
 
 
 // Use media queries like this:
@@ -52,10 +55,12 @@ $bg-light:#EEF0FF;
 
 
 // Import partials from `sass_dir` (defaults to `_sass`)
-@import
-        "base",
+/*         "base",
         "layout",
         "syntax-highlighting",
+        	 */
+@import
+		"reset",
         "neat/neat",
         "custom"
 ;
