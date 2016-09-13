@@ -15,8 +15,9 @@ a, a:visited, a:focus, a:active{
 	font-size: 24px;
 	text-decoration: none;;
 	&:hover{
-		color: $dark-blue;
-		text-decoration: underline;
+		color: $orange;
+		-webkit-transition: color .2s;
+		transition: color .2s;
 	}
 	&.site-title{
 		font-size: 36px;
@@ -95,5 +96,5 @@ a, a:visited, a:focus, a:active{
 
 }
 .color-orange{
-	// color: $orange;
+	color: $orange;
 }
