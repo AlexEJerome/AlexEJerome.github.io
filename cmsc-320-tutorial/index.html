@@ -13116,100 +13116,28 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="The-Final-Tutorial-:-What-Makes-a-Good-Headline?">The Final Tutorial : What Makes a Good Headline?<a class="anchor-link" href="#The-Final-Tutorial-:-What-Makes-a-Good-Headline?">&#182;</a></h1><h3 id="The-results-will-shock-you!">The results will shock you!<a class="anchor-link" href="#The-results-will-shock-you!">&#182;</a></h3>
+<h1 id="Analyzing-Popular-News-Stories">Analyzing Popular News Stories<a class="anchor-link" href="#Analyzing-Popular-News-Stories">&#182;</a></h1><h3 id="The-results-will-shock-you!">The results will shock you!<a class="anchor-link" href="#The-results-will-shock-you!">&#182;</a></h3><h4 id="By:-Alex-Jerome-and-Sanjana-Chowdhury">By: Alex Jerome and Sanjana Chowdhury<a class="anchor-link" href="#By:-Alex-Jerome-and-Sanjana-Chowdhury">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Code used to gather data:</p>
-
-<pre><code>!pip install webhoseio
-import pandas as pd
-import webhoseio
-
-# put your own webhoseio api key in the my_api_key variable.
-# (run api_key.py is to prevent the key from being shown publicly on github)
-# There will be a error, but it won't affect anything.
-
-my_api_key = ""
-%run api_key.py
-
-# Try to avoid re-running this one alot we have 1000 queries max.
-
-webhoseio.config(token=my_api_key)
-query_params = {
-    "q": "language:english site_type:news social.facebook.likes:&gt;500",
-    "ts": "1542059049078",
-    "sort": "social.facebook.likes"
-    }
-
-output = webhoseio.query("filterWebContent", query_params)
-
-
-i = 0
-t = 838
-data_persons = [] 
-data_organizations = []
-data_locations = []
-data_notags = []
-for x_r in range(t):
-
-    for post in output['posts']:
-        d_base = {
-                'title' : post['thread']['title'],
-                'fb_likes' : post['thread']['social']['facebook']['likes'],
-                'fb_comments' : post['thread']['social']['facebook']['comments'],
-                'fb_shares' : post['thread']['social']['facebook']['shares'],
-                'spam_score' : post['thread']['spam_score'],
-                'performance_score' : post['thread']["performance_score"],
-                'domain_rank' : post['thread']['domain_rank'],
-                'site' : post['thread']['site'],
-                'uuid' : post['thread']['uuid']
-            }
-        data_notags.append(d_base)
-        for person in post['entities']['persons']:
-            d_p = d_base.copy()
-            d_p['tag'] = person['name']
-            d_p['sentiment'] = person['sentiment']
-            data_persons.append(d_p)
-        for organization in post['entities']['organizations']:
-            d_o = d_base.copy()
-            d_o['tag'] = organization['name']
-            d_o['sentiment'] = organization['sentiment']
-            data_organizations.append(d_o)
-        for location in post['entities']['locations']:
-            d_l = d_base.copy()
-            d_l['tag'] = location['name']
-            d_l['sentiment'] = organization['sentiment']
-            data_locations.append(d_l)
-    i = i+1
-    print(str(i*100) + ' / 83850')
-    output = webhoseio.get_next()
-
-
-df_persons = pd.DataFrame(data_persons)
-df_organizations = pd.DataFrame(data_organizations)
-df_locations = pd.DataFrame(data_locations)
-df_all = pd.DataFrame(data_persons+data_organizations+data_locations)
-df_notags = pd.DataFrame(data_notags)
-display(df_all)
-
-</code></pre>
-<p>Then we saved the data to CSVs for later use. 
-We import these CSVs into dataframes.</p>
-
-<pre><code>df_dict = {"df_persons":df_persons,
-           "df_organizations":df_organizations,
-           "df_locations":df_locations,
-           "df_all":df_all,
-           "df_notags":df_notags}
-for k, v in df_dict.items():
-    v.to_csv(k+".csv")
-
-</code></pre>
-<p>Let's import each CSV into a dataframe by essentially doing the reverse process.</p>
+<h2 id="Idea">Idea<a class="anchor-link" href="#Idea">&#182;</a></h2><p>In this day and age with news sharing so prevalent, it’s interesting to see what in news attracts so much attention from people. What makes an article more shareable than others? Is there a trend as to which articles are shared more? The contents of an article may influence how the reader perceives the article and the different aspects and data that are recorded from news articles, and what we can so with them.</p>
+<h2 id="Data">Data<a class="anchor-link" href="#Data">&#182;</a></h2><h3 id="Data-Scraping-and-Processing">Data Scraping and Processing<a class="anchor-link" href="#Data-Scraping-and-Processing">&#182;</a></h3><p>We used data from webhose.io. However, this was a very difficult process.</p>
+<p>“Popular News Articles” 
+Can sign up for free to access the two folders of JSON files that contain information for news articles from the last 30 days, and your API key which will be important:</p>
+<p>Using this API key, we can retrieve several hundred data points at a time. From these data points, you can make them into a dictionary, turn that dictionary into a pandas dataframe, and turn that dataframe into a csv file. This seems really simple, but when processing over 80,000 JSON files, it takes an incredible amount of time and processing power, and we ourselves ran into quite a few issues while doing this (over 8 hours worth of trouble)</p>
+<p>Lucky for you, we turned all of this into a few csv files, all categorized differently depending on what data you want to look at. You can easily copy the files and put them in the same folder as your notebook from the following github link:</p>
+<p><a href="https://github.com/AlexEJerome/CMSC320-Tutorial.git">https://github.com/AlexEJerome/CMSC320-Tutorial.git</a></p>
+<p>There is no df_all.csv in this above. The reason being, that this file is over 100MB and github will not store that. Therefore, to create df_all.csv on your machine, simply append df_organizations, df_persons, and df_locations together.</p>
+<p>To do this, either follow the code below, or, better yet, try it yourself and follow these links to find out how to read in csv's into Pandas, convert them into dataframes, append them, and save them as csv's.</p>
+<ul>
+<li><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_csv.html">https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_csv.html</a></li>
+<li><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html">https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html</a></li>
+<li><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html">https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html</a></li>
+</ul>
+<p>We moved the code to gather the said data to the appendix, so you do not have to scroll through it to read about the data analysis.</p>
 
 </div>
 </div>
@@ -16264,6 +16192,109 @@ washington 0.0022970671926285454
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<section id="appendix">
+    <h2>Appendix</h2>
+</section>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Code used to gather datca:</p>
+
+<pre><code>!pip install webhoseio
+import pandas as pd
+import webhoseio
+
+# put your own webhoseio api key in the my_api_key variable.
+# (run api_key.py is to prevent the key from being shown publicly on github)
+# There will be a error, but it won't affect anything.
+
+my_api_key = ""
+%run api_key.py
+
+# Try to avoid re-running this one alot we have 1000 queries max.
+
+webhoseio.config(token=my_api_key)
+query_params = {
+    "q": "language:english site_type:news social.facebook.likes:&gt;500",
+    "ts": "1542059049078",
+    "sort": "social.facebook.likes"
+    }
+
+output = webhoseio.query("filterWebContent", query_params)
+
+
+i = 0
+t = 838
+data_persons = [] 
+data_organizations = []
+data_locations = []
+data_notags = []
+for x_r in range(t):
+
+    for post in output['posts']:
+        d_base = {
+                'title' : post['thread']['title'],
+                'fb_likes' : post['thread']['social']['facebook']['likes'],
+                'fb_comments' : post['thread']['social']['facebook']['comments'],
+                'fb_shares' : post['thread']['social']['facebook']['shares'],
+                'spam_score' : post['thread']['spam_score'],
+                'performance_score' : post['thread']["performance_score"],
+                'domain_rank' : post['thread']['domain_rank'],
+                'site' : post['thread']['site'],
+                'uuid' : post['thread']['uuid']
+            }
+        data_notags.append(d_base)
+        for person in post['entities']['persons']:
+            d_p = d_base.copy()
+            d_p['tag'] = person['name']
+            d_p['sentiment'] = person['sentiment']
+            data_persons.append(d_p)
+        for organization in post['entities']['organizations']:
+            d_o = d_base.copy()
+            d_o['tag'] = organization['name']
+            d_o['sentiment'] = organization['sentiment']
+            data_organizations.append(d_o)
+        for location in post['entities']['locations']:
+            d_l = d_base.copy()
+            d_l['tag'] = location['name']
+            d_l['sentiment'] = organization['sentiment']
+            data_locations.append(d_l)
+    i = i+1
+    print(str(i*100) + ' / 83850')
+    output = webhoseio.get_next()
+
+
+df_persons = pd.DataFrame(data_persons)
+df_organizations = pd.DataFrame(data_organizations)
+df_locations = pd.DataFrame(data_locations)
+df_all = pd.DataFrame(data_persons+data_organizations+data_locations)
+df_notags = pd.DataFrame(data_notags)
+display(df_all)
+
+</code></pre>
+<p>Then we saved the data to CSVs for later use. 
+We import these CSVs into dataframes.</p>
+
+<pre><code>df_dict = {"df_persons":df_persons,
+           "df_organizations":df_organizations,
+           "df_locations":df_locations,
+           "df_all":df_all,
+           "df_notags":df_notags}
+for k, v in df_dict.items():
+    v.to_csv(k+".csv")
+
+</code></pre>
+<p>Let's import each CSV into a dataframe by essentially doing the reverse process.</p>
+
+</div>
+</div>
 </div>
     </div>
   </div>
