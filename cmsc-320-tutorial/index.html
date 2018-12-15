@@ -13124,10 +13124,46 @@ div#notebook {
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Idea">Idea<a class="anchor-link" href="#Idea">&#182;</a></h2><p>In this day and age with news sharing so prevalent, it’s interesting to see what in news attracts so much attention from people. What makes an article more shareable than others? Is there a trend as to which articles are shared more? The contents of an article may influence how the reader perceives the article and the different aspects and data that are recorded from news articles, and what we can so with them.</p>
-<h2 id="Data">Data<a class="anchor-link" href="#Data">&#182;</a></h2><h3 id="Data-Scraping-and-Processing">Data Scraping and Processing<a class="anchor-link" href="#Data-Scraping-and-Processing">&#182;</a></h3><p>We used data from webhose.io. However, this was a very difficult process.</p>
-<p>“Popular News Articles” 
-Can sign up for free to access the two folders of JSON files that contain information for news articles from the last 30 days, and your API key which will be important:</p>
-<p>Using this API key, we can retrieve several hundred data points at a time. From these data points, you can make them into a dictionary, turn that dictionary into a pandas dataframe, and turn that dataframe into a csv file. This seems really simple, but when processing over 80,000 JSON files, it takes an incredible amount of time and processing power, and we ourselves ran into quite a few issues while doing this (over 8 hours worth of trouble)</p>
+<h2 id="Data">Data<a class="anchor-link" href="#Data">&#182;</a></h2><h3 id="Data-Scraping">Data Scraping<a class="anchor-link" href="#Data-Scraping">&#182;</a></h3><p>We used data from <a href="https://webhose.io">webhose.io</a>. What made this data source so useful, despite the difficult setup, was that they had already done some NLP (Natural Language Processing).</p>
+<p>For each post, they had already extracted the following data. It looked a bit like this</p>
+<ul>
+<li>News article UniqueID ("uuid")</li>
+<li>News article subjects<ul>
+<li>Persons<ul>
+<li>name</li>
+<li>sentiments</li>
+</ul>
+</li>
+<li>Organizations<ul>
+<li>name</li>
+<li>sentiments</li>
+</ul>
+</li>
+<li>Locations<ul>
+<li>name</li>
+<li>sentiments</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>News article social media shares per platform<ul>
+<li>facebook<ul>
+<li>likes</li>
+<li>shares</li>
+</ul>
+</li>
+<li>comments</li>
+<li>twitter</li>
+<li>pinterest</li>
+</ul>
+</li>
+<li>News article popularity metric (scale 1-10, <a href="https://webhose.io/blog/api/webhose-io-tip-search-for-top-performing-viral-posts/">read more here</a>)</li>
+<li>News article spamminess metric (scale 0-1)</li>
+</ul>
+<h4 id="&#8220;Popular-News-Articles&#8221;">&#8220;Popular News Articles&#8221;<a class="anchor-link" href="#&#8220;Popular-News-Articles&#8221;">&#182;</a></h4><p>Can sign up for free to access the two folders of JSON files that contain information for news articles from the last 30 days, and your API key which will be important:</p>
+<p>Using this API key, we can retrieve several hundred data points at a time. From these data points, you can make them into a dictionary, turn that dictionary into a pandas dataframe, and turn that dataframe into a csv file. This seems really simple, but when processing over 80,000 JSON files, it takes an incredible amount of time and processing power, and we ourselves ran into quite a few issues while doing this (over 12 hours worth of trouble).</p>
+<h3 id="Data-Processing">Data Processing<a class="anchor-link" href="#Data-Processing">&#182;</a></h3><p>Because these JSON files were essentially python dictionaries with a few levels in depth (as per the example tree above), we couldn't directly import them into Python. Rather, we had to import the dictionary, and then clean the data up to make sure it could be put into a Pandas DataFrame.</p>
+<p>The way this was done is that for each "news article subject" or "tag", we created a new row in the dataframe that related it's name and sentiment to the unique ID as to comply with <a href="https://www.jstatsoft.org/index.php/jss/article/view/v059i10/v59i10.pdf">Tidy Data Standards</a>.</p>
 <p>Lucky for you, we turned all of this into a few csv files, all categorized differently depending on what data you want to look at. You can easily copy the files and put them in the same folder as your notebook from the following github link:</p>
 <p><a href="https://github.com/AlexEJerome/CMSC320-Tutorial.git">https://github.com/AlexEJerome/CMSC320-Tutorial.git</a></p>
 <p>There is no df_all.csv in this above. The reason being, that this file is over 100MB and github will not store that. Therefore, to create df_all.csv on your machine, simply append df_organizations, df_persons, and df_locations together.</p>
@@ -13137,26 +13173,18 @@ Can sign up for free to access the two folders of JSON files that contain inform
 <li><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html">https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.append.html</a></li>
 <li><a href="https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html">https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.to_csv.html</a></li>
 </ul>
-<p>We moved the code to gather the said data to the appendix, so you do not have to scroll through it to read about the data analysis.</p>
+<p>We moved the code to gather the said data to the <a href="#appendix">appendix</a>, so you do not have to scroll through it to read about the data analysis.</p>
 
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[145]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span> 
-<span class="c1">#often times, we&#39;ll see warnings as a sign of caution. For our purpose, we&#39;re going to ignore these and they don&#39;t affect our tutorial</span>
-<span class="c1">#you can undo this if you want</span>
-</pre></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Imported-Data">Imported Data<a class="anchor-link" href="#Imported-Data">&#182;</a></h4><p>So below is the imported data from the CSVs mentioned above. We displayed a subset of the 627948 rows contained in df_all.</p>
 
-    </div>
 </div>
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -14087,23 +14115,16 @@ Can sign up for free to access the two folders of JSON files that contain inform
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># trying slightly different method because of strange sampling results</span>
-<span class="n">df_sample</span> <span class="o">=</span> <span class="n">df_all</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">df_sample</span> <span class="o">=</span> <span class="n">df_sample</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-<span class="n">df_all_uuids</span> <span class="o">=</span> <span class="n">df_sample</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
-<span class="n">df_all_uuids_1000</span> <span class="o">=</span> <span class="n">df_all_uuids</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[:</span><span class="mi">5000</span><span class="p">]</span>
-<span class="c1"># display(df_all_uuids_1000_series)</span>
-</pre></div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Exploratory-Analysis:">Exploratory Analysis:<a class="anchor-link" href="#Exploratory-Analysis:">&#182;</a></h2><h3 id="Do-topics-influence-article-performance?">Do topics influence article performance?<a class="anchor-link" href="#Do-topics-influence-article-performance?">&#182;</a></h3><p>From anecdotal evidence, both Sanjana and Alex confirmed that they look at certain news articles based on their topics. Was this true in general?</p>
+<p>First, we wanted to see if certain tags in the data had different numbers of facebook likes on average. to do that, we imported seaborn, a data visualization tool, and created a simple box plot.</p>
+<h4 id="A-Visual-Inspection">A Visual Inspection<a class="anchor-link" href="#A-Visual-Inspection">&#182;</a></h4><p>The box plot from seaborn takes an "x" parameter, and a "y" parameter. In box plots, seaborn groups the y values from the data provided in the data parameter by the x parameter. Or in this case, Seaborn created a box plot fo facebook likes, grouped by tag, from the data provided in the 500 data point sample taken from df_all.</p>
+<p>The results are below:</p>
 
-    </div>
 </div>
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -14151,6 +14172,99 @@ Can sign up for free to access the two folders of JSON files that contain inform
 
 </div>
 
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Boxplot-results">Boxplot results<a class="anchor-link" href="#Boxplot-results">&#182;</a></h4><p>This looks super messy, but just visually it looks that various tags have significantly varied performance. While the standarad deviations look a bit large, there could be a potential that a tag leads to some correlation in whether or not the post performs well!</p>
+<h4 id="Using-Random-Forests">Using Random Forests<a class="anchor-link" href="#Using-Random-Forests">&#182;</a></h4><p>This was the most difficult process, mainly because of some very rare bugs that did not really make too much sense. However, after about 10 hours of debugging, you can get it to work to!</p>
+<h5 id="Supervised-Learning-Processes-(High-Level)">Supervised Learning Processes (High Level)<a class="anchor-link" href="#Supervised-Learning-Processes-(High-Level)">&#182;</a></h5><p>First we had to determine what type of learning to do on the data set.</p>
+<ol>
+<li>Supervised or Unsupervised Learning?<ul>
+<li>We had a set of data points (or tags) and results from those tags (popularity in facebook likes). </li>
+<li>Because we had results that we were attempting to match the data up with, this is considered supervised learning
+<br/></li>
+</ul>
+</li>
+<li><p>What strategy of supervised learning to use?</p>
+<p><a href="https://en.wikipedia.org/wiki/Supervised_learning">According to Wikipedia there are a few models</a>:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Support_vector_machine">Support Vector Machines</a>?<ul>
+<li>No, we aren't trying to discriminate between 2 types. We are trying to attach a number to a tag or group of tags</li>
+</ul>
+</li>
+<li><a href="https://en.wikipedia.org/wiki/Linear_regression">Linear Regression</a>?<ul>
+<li>No, tags don't have a numeric meaning attached to them. This means that a independent variable increase doesn't have meaning.</li>
+</ul>
+</li>
+<li><a href="https://en.wikipedia.org/wiki/Naive_Bayes_classifier">Naive Bayes</a><ul>
+<li>No, similar to SVMs, the tags might not be completely independent.</li>
+</ul>
+</li>
+<li><a href="https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm">K-NN</a><ul>
+<li>Maybe, but it could return nearest neighbors that are completely irrelevant. It was hard to decide on this one. There might be a better choice</li>
+</ul>
+</li>
+<li><a href="https://en.wikipedia.org/wiki/Decision_tree_learning">Decision Trees</a><ul>
+<li>Ultimately the choice that was made because we could tie importance to specific tags, but not eliminate the dependence of other tags to tags higher up in the tree.</li>
+<li>The "Random Forest" algorithm is considered the most stable of these versions. So we went with that.
+<br/></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>How to use tags in decision trees?</p>
+<p>How do we use tags in decision trees then? Decision trees would have a similar issue to other algorithms - assigning random integers to tags with no inherit meaning.</p>
+<p>However, thinking back to our Class Lectures, specifically the class on NLP, a strategy that would work is to <a href="https://www.cs.umd.edu/class/fall2018/cmsc320/lecs/cmsc320_f2018_lec16.pdf">create a frequency table to identify documents</a>.</p>
+<p>To do this, we would need to do a cross tabulation of UUID with Tags from the df_all table.</p>
+<p>From there all we had to do was join the data from the frequency table, the uuid, and the metric (facebook likes), and put it into the Random Forest Algorithm.</p>
+<p>Easy, right?</p>
+</li>
+</ol>
+<h5 id="Initial-Process...-not-so-easy.">Initial Process... not so easy.<a class="anchor-link" href="#Initial-Process...-not-so-easy.">&#182;</a></h5><p>So initially we tried to sample from all uuids from the "no tags" csv. This would ensure that no "uuid" was repeated since each unique id should be mentioned once. Then, once we got our sample from the "no tags" UUIDs, we would then iterate through each UUID, and where the UUID was in df_all, then we pull the corresponding tags.</p>
+<p>Then, we would create a frequency table of the uuids versus tags. Then, we would use an inner join on the UUIDs from the frequency table and the UUIDs from the df_notags to ensure that only the UUIDs on the frequency table would have the metrics (like facebook likes) added to the columns.</p>
+<p>However, when we would use sklearn's train_test_split function (which would effectively split the training data into training data and test data) we would run into an error:</p>
+<p><code>different number of data points / rows in provided data</code>.</p>
+<p>Weird, right? We would take the same data, which would have the same length throughout, but when we got down to spliting it up into the frequency table and the resultant training data (the facebook likes), we would have different amounts of data, with what appeared to be the same amount of UUIDS. Strangely, the number of rows it differed by seemed to be dependent on the number of sampled rows. It would usually differ by about 0.2% of the number of sampled data points.</p>
+<p>We did everything from resetting the index, grouping differently, sampling differently to try to figure out the issue.</p>
+<h5 id="A-(Better)-Solution">A (Better) Solution<a class="anchor-link" href="#A-(Better)-Solution">&#182;</a></h5><p>Perhaps a fundamental question was where was the error and why.</p>
+<p>First looking at tbe data, we made the assumption that each post had a tag. That's not necessarily true. There were posts with unique IDs that didn't have tags. They therefore did not show up in the df_all.csv.</p>
+<p>In addition, an inner join shouldn't be inconsistent by nature. But it clearly appeared to be. Because the error did not show up until the join, maybe the data wasn't the full problem?</p>
+<p>To deal with this, we decided to completely eliminate the inner join. Instead, we would have to gather each table without joining.</p>
+<p>Finally, when we got this to work, there was a low prediction score for tags to facebook likes. How could we fix this?</p>
+<h6 id="Summary-of-Potential-issue-areas:">Summary of Potential issue areas:<a class="anchor-link" href="#Summary-of-Potential-issue-areas:">&#182;</a></h6><ul>
+<li>Inconsistent Data (Df_All['uuid'] $\neq$ df_notags['uuid']</li>
+<li>Inconsistent results of inner join</li>
+<li>Low prediction score (below 1%). </li>
+</ul>
+<h6 id="How-we-re-wrote-the-algorithm:">How we re-wrote the algorithm:<a class="anchor-link" href="#How-we-re-wrote-the-algorithm:">&#182;</a></h6><ol>
+<li>Instead of sampling from the DF_notags (where some uuids that aren't in df_all may be present), we sampled from DF_all after grouping it on uuid. We took the first 5000 tags in this case. Since the UUIDs are randomized, the actual first 5000 from a sorted list are also by nature randomized.</li>
+<li>For every UUID from the sample above, we appended the relevant tags from df_all to the table.</li>
+<li>Instead of trying to predict facebook likes, we instead tied it to the standardized metric provided by "Webhose.io" called "performance_score", which determined on a scale of 1-10 how well it performed. We grabbed the relevant scores from the sampled UUIDS above.</li>
+<li>We re-wrote the Random Forest Algorithm to match the tutorial found <a href="https://www.datacamp.com/community/tutorials/random-forests-classifier-python">here</a> to ensure that it worked correctly.</li>
+</ol>
+<p>Scroll down to see the basic output of the code!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># trying slightly different method because of strange sampling results</span>
+<span class="n">df_sample</span> <span class="o">=</span> <span class="n">df_all</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_sample</span> <span class="o">=</span> <span class="n">df_sample</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;uuid&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">df_all_uuids</span> <span class="o">=</span> <span class="n">df_sample</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+<span class="n">df_all_uuids_1000</span> <span class="o">=</span> <span class="n">df_all_uuids</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[:</span><span class="mi">5000</span><span class="p">]</span>
+<span class="c1"># display(df_all_uuids_1000_series)</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 
@@ -15186,38 +15300,24 @@ Name: performance_score, Length: 4984, dtype: object</pre>
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Clearly there&#39;s something to it, but there&#39;s also lots of variance here... </span>
 <span class="c1"># and assuming tags interact we probably need to do a Random Forest</span>
 <span class="c1"># To get there, it&#39;s a good idea to start with converting each tag to a frequency table per uuid</span>
-<span class="c1"># table = df_all.sample(n=8000).reset_index()</span>
-<span class="c1"># table = sample_df.groupby([&#39;uuid&#39;]).count()</span>
-<span class="c1"># table = sample_df.dropna().set_index(&#39;uuid&#39;).drop_duplicates()</span>
-<span class="c1"># table = table[~table.index.duplicated(keep=&#39;first&#39;)].reset_index()</span>
-
-
 
 <span class="c1"># NEW VERSION!</span>
 
 <span class="n">table</span> <span class="o">=</span> <span class="n">sample_df</span>
 
-
-<span class="c1"># display(table[&#39;uuid&#39;])</span>
-<span class="c1"># display(table)</span>
 <span class="n">freq_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">],</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;tag&#39;</span><span class="p">])</span>
 
-<span class="c1"># display(freq_table)</span>
 <span class="c1"># Import train_test_split function</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
-
-<span class="c1"># freq_table_and_data = freq_table.join(df_notags.set_index(&#39;uuid&#39;), on=&#39;uuid&#39;, how=&quot;inner&quot;)</span>
-
 
 
 <span class="n">X</span><span class="o">=</span><span class="n">freq_table</span>  <span class="c1"># Features</span>
 <span class="n">y</span><span class="o">=</span><span class="n">sm_df</span>  <span class="c1"># Labels</span>
 <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
-<span class="c1"># display(freq_table_and_data)</span>
-<span class="c1"># display(X)</span>
-<span class="c1"># display(y)</span>
+
 <span class="c1"># Split dataset into training set and test set</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span> <span class="c1"># 70% training and 30% test</span>
+<span class="c1"># 70% training and 30% test</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span> 
 </pre></div>
 
     </div>
@@ -15300,6 +15400,15 @@ Name: performance_score, Length: 4984, dtype: object</pre>
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Random-Forest-Results:">Random Forest Results:<a class="anchor-link" href="#Random-Forest-Results:">&#182;</a></h4><p>Only 31% accuracy. While much better than the less than 1% accuracy, still not perfect. Out of curiousity, though, are there still some terms that had a higher impact?</p>
+<p>Below is a list of top 10 important features generated by the code below:</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[20]:</div>
@@ -15348,6 +15457,28 @@ washington 0.0022970671926285454
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Random-Forest-Analysis:">Random Forest Analysis:<a class="anchor-link" href="#Random-Forest-Analysis:">&#182;</a></h4><p>Interestingly enough, it appears that some terms definitely have an impact.</p>
+<ol>
+<li>Divisiveness is important. We can see that both "Trump" and "Donald Trump" were spots 2 and 3 respectively on the list. In additon, Brexit comes in at 9th. Due to the divisiveness of both Brexit and Donald Trump it makes sense he would be a popular topic.</li>
+<li>Your news organization matters. The first item on the feature importance list is "Tanjug" a Serbian-State owned news agency, along with CNN in 4th, and and BBC News in 8th. It shows that the actual publisher of the news has an impact on the success of the article.</li>
+<li>Location also mattered as India, UK, US, and Washington all had top placement.</li>
+<li>It appears that actually that all categories of tags (locations, persons, and organizations) have some impact on the popularity of the article.</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Sentiment-Popularity-Analysis">Sentiment Popularity Analysis<a class="anchor-link" href="#Sentiment-Popularity-Analysis">&#182;</a></h3><p>One thing that is interesting is that each article has a bunch of tags, and all of those tags each have an associated sentiment to them. The possibilities are “positive”, “negative”, or “neutral”. Sentiment refers to how the tag is generally perceived. What we are going to explore is which overall sentiment of the article has the more likes or shares, and see if we can come up with any conclusions.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
@@ -15382,44 +15513,14 @@ washington 0.0022970671926285454
 </div>
 
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#find the correlation between total sentiment and popularity </span>
-<span class="c1">#a lot of tags have biased sentiments</span>
-<span class="c1">#each tag coresponds to a sentiment</span>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Overall sentiment is going to be our way to add a sentiment metric to the article and not just its tags. The sentiment metric is going to be called “sent_metric”, and this value will be associated with the tagged sentiment. The value will be initialized to 0, which is our neutral sentiment. If the sentiment is negative, the metric will be set to -1. Otherwise, if it’s positive, the metric will be set to 1. If there is no sentiment attached to the tag, then it won’t change.</p>
+<p>The data is huge, like, over half of a million huge. That is because df_all has all the tags in all of the 70,000+ articles. When it comes to massive data sets and a standard laptop, it’s almost impossible to go through all of that data in a reasonable amount of time. Here, we chose a subset of the data and only processed 30,000 of the first tags that had a biased sentiment attached to them. Feel free to use other subsets of data, smaller or bigger subsets, randomize data from the dataframe, etc. Just beware, the bigger the data set you want to process, the more time and energy it will need. Processing 30,000 samples takes about a few minutes every time.</p>
 
-<span class="c1">#how are we going to calculate sentiment?</span>
-<span class="c1">#we&#39;re going to calculate an overall sentiment</span>
-<span class="c1">#for each group by uuid, which is the article and its tags, loop through to calculate an overall sentiments </span>
-<span class="c1">#+1 for positive, -1 for negative, and do nothing for none </span>
-
-<span class="c1">#put it in a new dataframe with uuid and sentiment metric</span>
-<span class="n">sentiments</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;sentiment&#39;</span><span class="p">])</span> 
-<span class="n">sentiments</span><span class="p">[</span><span class="s1">&#39;uuid&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">df_all</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;uuid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-
-<span class="c1">#add a new column to df_all copy df .copy for -1 1 0 sentiments </span>
-<span class="c1">#for groupby uid, do sum on sentiments</span>
-
-<span class="c1">#calculate all of the stuff</span>
-<span class="n">i</span><span class="o">=</span><span class="mi">0</span> <span class="c1">#to add all the uuids</span>
-<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">df_all</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;uuid&#39;</span><span class="p">):</span>
-    <span class="n">total</span><span class="o">=</span><span class="mi">0</span> 
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;sentiment&#39;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="s2">&quot;negative&quot;</span><span class="p">:</span>
-            <span class="n">total</span><span class="o">=</span> <span class="n">total</span><span class="o">-</span><span class="mi">1</span> 
-        <span class="k">elif</span> <span class="n">j</span><span class="o">==</span><span class="s2">&quot;positive&quot;</span><span class="p">:</span>
-            <span class="n">total</span><span class="o">=</span> <span class="n">total</span><span class="o">+</span><span class="mi">1</span> 
-    <span class="n">sentiments</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="s1">&#39;sentiment&#39;</span><span class="p">]</span><span class="o">=</span> <span class="n">total</span>
-    <span class="n">i</span><span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
-</pre></div>
-
-    </div>
 </div>
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -15580,6 +15681,15 @@ washington 0.0022970671926285454
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The next part is a little tricky.</p>
+<p>We see that in df_all, the dataframe with all our tags, there are multiple tags per uuid, which is unique to the article, but not unique in the dataframe. We can use ‘groupby’ to group all these tags by their article, and then sum the sent_metric of each tag to come up with an overall sentiment.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[111]:</div>
@@ -15599,6 +15709,15 @@ washington 0.0022970671926285454
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To store this new data and other things we’ll need later, create a new dataframe that will store information for each article. We’ll call this dataframe “df_art”, and create a column called “total_sent” to represent the overall sentiment of the article.</p>
+<p>For each group, call .sum() on the group’s sent_metric to find the total of all the tags of that article. Store this sum in df_art to the corresponding index.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -15705,6 +15824,15 @@ washington 0.0022970671926285454
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are various ways of looping through groups and indexing and setting values in a dataframe. The way we did it here is by using an index variable, c, to allow us to keep track of where we are in the data frame while going through each group.</p>
+<p>Then, add more variables to the dataframe using the same methodology. These variables will make it a lot easier to graph the data points. Here, add the facebook likes and shares.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[127]:</div>
@@ -15726,6 +15854,14 @@ washington 0.0022970671926285454
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Also, create a column called “sign_of_sent” that says if the overall sentiment is either negative or positive. This will help visualize and separate the negative sentiments from the positive sentiments.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -15851,6 +15987,15 @@ washington 0.0022970671926285454
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Look! We’re almost done!</p>
+<p>Graph the plots using seaborn, which is really easy and intuitive. Pass in the dataframe, and which values you want your x and y to be. In this case, the x axis is the overall sentiment and the y access would be the number of facebook likes or shares.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -16051,6 +16196,33 @@ washington 0.0022970671926285454
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Analysis">Analysis<a class="anchor-link" href="#Analysis">&#182;</a></h3><p>We can see that the range of facebook likes and shares for negative sentiment surpasses those of the positive sentiment:</p>
+<p>Likes: Negative: 300,000+; Positive: 150,000
+Shares: Negative: 35,000; Positive: a little less than 25,000</p>
+<p>We can also see that there are far more articles with negative sentiments than positive sentiments.  There are also more overall extremes for the negative sentiments themselves. The lowest sentiment is -8, and the highest sentiment is 5.</p>
+<p>From this analyses, we can come up with a few conclusions:</p>
+
+<pre><code>1. Articles with negative sentiment tend to have more likes and shares than articles with positive sentiment 
+2. Articles that do have negative sentiments have a bigger range of being negative, specifically [-8, 0) compared to a smaller range for positive sentiments,  (0, 5] 
+3. There are more negative articles than positive articles out there
+
+</code></pre>
+<h4 id="Disclaimer">Disclaimer<a class="anchor-link" href="#Disclaimer">&#182;</a></h4><p>These conclusions have a lot of potential of being skewed/false. The data used to come up with the analyses is only a small set from the data that was scraped. And that subset of data is not randomized. Results can vary depending on the sample size and randomness of the sample.</p>
+<p>The difference in range and number of positive and negative articles may be also due to selecting the sample, and they conclusions may change with a more random sample. It would be interesting to rerun the analyses with different subsets of the sample. If the conclusions remain the same with different sampling methodologies, then there’s a higher chance that the given conclusions above are true.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="A-Small-Extension">A Small Extension<a class="anchor-link" href="#A-Small-Extension">&#182;</a></h4>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[156]:</div>
@@ -16196,9 +16368,25 @@ washington 0.0022970671926285454
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<section id="appendix">
+<p>The articles that were sampled may also have an incredible amount of negative tags for reasons not so random. As seen here, there are multiple tags, “trump”, that had a negative sentiment attached to them. Donald J Trump is a very controversial figure. Trends in journalism have a great effect to what articles are put out there, and what is available to readers. The conspiracy of the 45th presidency has garnered a lot of attention just only over the past few years, and this data does not accurately reflect media over time.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>The tagged people, tagged locations, and tagged media locations had a somewhat significant impact on the popualarity of the article. The sentiment also associated with those tags have an effect on the amount of shares and likes. We can conclude that if journalists want to create a really popular article, they should write about divisive topics such as Donald Trump and Brexit. The most popular articles will aslo be from popular media organizations, and written about in a negative light.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div id="appendix">
     <h2>Appendix</h2>
-</section>
+</div>
 </div>
 </div>
 </div>
