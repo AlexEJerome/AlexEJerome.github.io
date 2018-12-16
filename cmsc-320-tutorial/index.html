@@ -25,7 +25,7 @@ html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-}
+}tbh
 body {
   margin: 0;
 }
@@ -14231,7 +14231,7 @@ div#notebook {
 <p>Weird, right? We would take the same data, which would have the same length throughout, but when we got down to spliting it up into the frequency table and the resultant training data (the facebook likes), we would have different amounts of data, with what appeared to be the same amount of UUIDS. Strangely, the number of rows it differed by seemed to be dependent on the number of sampled rows. It would usually differ by about 0.2% of the number of sampled data points.</p>
 <p>We did everything from resetting the index, grouping differently, sampling differently to try to figure out the issue.</p>
 <h5 id="A-(Better)-Solution">A (Better) Solution<a class="anchor-link" href="#A-(Better)-Solution">&#182;</a></h5><p>Perhaps a fundamental question was where was the error and why.</p>
-<p>First looking at tbe data, we made the assumption that each post had a tag. That's not necessarily true. There were posts with unique IDs that didn't have tags. They therefore did not show up in the df_all.csv.</p>
+<p>First looking at the data, we made the assumption that each post had a tag. That's not necessarily true. There were posts with unique IDs that didn't have tags. They therefore did not show up in the df_all.csv.</p>
 <p>In addition, an inner join shouldn't be inconsistent by nature. But it clearly appeared to be. Because the error did not show up until the join, maybe the data wasn't the full problem?</p>
 <p>To deal with this, we decided to completely eliminate the inner join. Instead, we would have to gather each table without joining.</p>
 <p>Finally, when we got this to work, there was a low prediction score for tags to facebook likes. How could we fix this?</p>
@@ -15462,8 +15462,8 @@ washington 0.0022970671926285454
 <div class="text_cell_render border-box-sizing rendered_html">
 <h4 id="Random-Forest-Analysis:">Random Forest Analysis:<a class="anchor-link" href="#Random-Forest-Analysis:">&#182;</a></h4><p>Interestingly enough, it appears that some terms definitely have an impact.</p>
 <ol>
-<li>Divisiveness is important. We can see that both "Trump" and "Donald Trump" were spots 2 and 3 respectively on the list. In additon, Brexit comes in at 9th. Due to the divisiveness of both Brexit and Donald Trump it makes sense he would be a popular topic.</li>
-<li>Your news organization matters. The first item on the feature importance list is "Tanjug" a Serbian-State owned news agency, along with CNN in 4th, and and BBC News in 8th. It shows that the actual publisher of the news has an impact on the success of the article.</li>
+<li>Divisiveness is important. We can see that both "Trump" and "Donald Trump" were spots 2 and 3 respectively on the list. In addition, Brexit comes in at 9th. Due to the divisiveness of both Brexit and Donald Trump it makes sense he would be a popular topic.</li>
+<li>Your news organization matters. The first item on the feature importance list is "Tanjug" a Serbian-State owned news agency, along with CNN in 4th, and BBC News in 8th. It shows that the actual publisher of the news has an impact on the success of the article.</li>
 <li>Location also mattered as India, UK, US, and Washington all had top placement.</li>
 <li>It appears that actually that all categories of tags (locations, persons, and organizations) have some impact on the popularity of the article.</li>
 </ol>
@@ -16376,7 +16376,7 @@ Shares: Negative: 35,000; Positive: a little less than 25,000</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>The tagged people, tagged locations, and tagged media locations had a somewhat significant impact on the popualarity of the article. The sentiment also associated with those tags have an effect on the amount of shares and likes. We can conclude that if journalists want to create a really popular article, they should write about divisive topics such as Donald Trump and Brexit. The most popular articles will aslo be from popular media organizations, and written about in a negative light.</p>
+<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion">&#182;</a></h2><p>The tagged people, tagged locations, and tagged media locations had a somewhat significant impact on the popularity of the article. The sentiment also associated with those tags have an effect on the amount of shares and likes. We can conclude that if journalists want to create a really popular article, they should write about divisive topics such as Donald Trump and Brexit. The most popular articles will also be from popular media organizations, and written about in a negative light.</p>
 
 </div>
 </div>
