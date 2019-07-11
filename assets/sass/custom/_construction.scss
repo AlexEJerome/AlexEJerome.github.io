@@ -1,5 +1,12 @@
 #construction{
+	font-size: 2.5vw;
+	margin: 10vw;
 	h1{
+		span:nth-child(2):after, span:nth-child(3):after{
+			content:'|';
+			color:white;
+			margin: 1vw;
+		}
 		span:nth-child(n+2){
 			background-color: #000;
 		}
