@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: page.lang | default: 'en' }}">
+
+  {% include head.html %}
+
+  <body>
+	{% include components/organisms/header.html %}
+    <main class="main" aria-label="Content">
+    	<h1>{{page.company}}</h1>
+    	<h2>{{page.position}}</h2>
+    	<p>{{page.long-description}}</p>
+    	{{ content }}
+    	{% include components/organisms/related-projects.html %}
+    </main>
+	{% include footer.html %}
+  </body>
+
+</html>

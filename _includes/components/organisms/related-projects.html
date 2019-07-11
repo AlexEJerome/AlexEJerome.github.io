@@ -1,0 +1,7 @@
+		<div class="related-projects">
+	    	{% for p in site.projects %}
+	    		{% if p.company==page.company and p.layout != "company"  %}
+	    			{% include components/molecules/card-project.html page=p %}
+	    		{% endif %}
+	    	{% endfor %}
+		</div>

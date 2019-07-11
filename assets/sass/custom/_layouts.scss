@@ -1,0 +1,25 @@
+body{
+	text-align: center;
+}
+
+// CV Page
+
+#resume{
+	max-width: 960px;
+	width: 100%;
+	margin: 0px auto auto;
+	display: inline-block;
+	text-align: left;
+	& section{
+		margin-left: 25px;
+		& .first-line{
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+		}
+ 	}
+ 	& .footnote{
+ 		font-size: .8rem;
+ 		color: #777;
+ 	}
+}

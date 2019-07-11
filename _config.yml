@@ -30,7 +30,7 @@ exclude:
   # - assets/sass
 
 # Plugin settings
-plugins_dir:
+plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
