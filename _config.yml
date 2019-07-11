@@ -6,15 +6,43 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: Alex Jerome
-email: ""
+title: Alex Jerome | 21st Century Marketer
 description: > # this means to ignore newlines until "baseurl:"
- I'm a Marketing major and a Computer Science minor at the University of Maryland, College Park.
- I'm known for my work at R2integrated, Mindgrub, RedBlack Consulting and Bitcamp.
+  With over 8 years of marketing expererience, Alex Jerome brings the best
+  to your company.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://alexejero.me" # the base hostname & protocol for your site
-twitter_username: AlexEJerome
-github_username:  AlexEJerome
+url: "alexejero.me" # the base hostname & protocol for your site
+
+# Markdown settings
+markdown: kramdown
+
+# Sass settings
+sass:
+  add_charset: true
+  sass_dir: assets/sass
+  style: :compressed
 
 # Build settings
-markdown: kramdown
+exclude:
+  - package.json
+  - README.md
+  - CNAME
+  # - assets/sass
+
+# Plugin settings
+plugins_dir:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+collections:
+  companies:
+      output: true
+      permalink: work-at/:title
+
+  projects:
+      output: true
+      permalink: /projects/:title
+  skills:
+      output: true
+       
