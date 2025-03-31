@@ -103,7 +103,7 @@
             // Generate Venmo buttons
             Object.values(groupedTrades).forEach(tradeGroup => {
             tradeGroup.forEach((trade, index) => {
-                const venmoLink = `https://venmo.com/?txn=pay&audience=private&recipients=${encodeURIComponent(trade.toUsername)}&amount=${trade.amount}&note=Payment`;
+                const venmoLink = `https://venmo.com/?txn=pay&audience=private&recipients=${encodeURIComponent(trade.toUsername)}&amount=${trade.amount}&note=Pizza`;
                 const button = document.createElement('button');
                 button.className = 'btn btn-lg btn-outline-primary';
                 button.type = 'button';
@@ -189,10 +189,12 @@
             const url = `https://alexejero.me/venmo-ledger?${tradeDetails}`;
 
             // Display the URL (or you can copy it to the clipboard)
-            alert(url);
+            
             // Copy URL to clipboard
             navigator.clipboard.writeText(url).then(() => {
             console.log('URL copied to clipboard!');
+            alert("Link Copied to Clipboard! Click OK to redirect.");
+                window.location.href = url;
             }).catch(err => {
             console.error('Could not copy URL: ', err);
             });
