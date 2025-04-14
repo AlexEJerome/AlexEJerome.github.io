@@ -135,11 +135,24 @@
                 buttonContainer.appendChild(link);
             });
             });
+            
+            // Add a reset button
+            const resetButton = document.createElement('button');
+            resetButton.className = 'btn btn-danger mt-3 w-100';
+            resetButton.textContent = 'Reset';
+            resetButton.onclick = () => {
+                window.location.href = window.location.origin + window.location.pathname;
+            };
 
+            
+            
             // Append the container to the main section
             const main = document.querySelector('main');
+            
             main.appendChild(instructions);
             main.appendChild(buttonContainer);
+            // Append the reset button to the main section
+            main.appendChild(resetButton);
         }
 
         // Call the function on page load
