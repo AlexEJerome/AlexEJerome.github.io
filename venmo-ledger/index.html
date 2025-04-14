@@ -101,7 +101,7 @@
             console.log(trades);
             document.getElementById('ledger-container').style.display = 'none';
             const instructions = document.createElement('p');
-            instructions.textContent = "Click the buttons below to pay directly though Venmo. \nYou can also copy the URL to share it with others.";
+            instructions.innerHTML = "Click the button(s) <strong>with your name</strong> below to pay directly though Venmo. You can also copy the URL to share it with others.";
 
             // Group trades by payer username
             const groupedTrades = trades.reduce((acc, trade) => {
