@@ -44,195 +44,171 @@
         
     </footer>
     <script>
-
-       function VenmoAdd() {
-            // Get the ledger container
+        function VenmoAdd() {
             const ledger = document.getElementById('ledger');
-
-            // Create a new row
             const newRow = document.createElement('div');
             newRow.className = 'row p-3';
-
-            // Add input fields for Name, Venmo Username, Buy In, Out, and Net
             newRow.innerHTML = `
                 <input type="text" class="col-3" placeholder="Name">
                 <input type="text" class="col-3" placeholder="Venmo Username">
-                <input type="text" class="col" placeholder="Buy In" oninput="updateNet(this)">
-                <input type="text" class="col" placeholder="Out" oninput="updateNet(this)">
+                <input type="number" class="col" placeholder="Buy In" oninput="updateNet(this)">
+                <input type="number" class="col" placeholder="Out" oninput="updateNet(this)">
                 <span class="col">$0.00</span>
             `;
-
-            // Append the new row to the ledger
             ledger.appendChild(newRow);
         }
 
         function updateNet(input) {
-            // Get the parent row
             const row = input.parentElement;
-
-            // Get the Buy In and Out values
             const buyIn = parseFloat(row.children[2].value) || 0;
             const out = parseFloat(row.children[3].value) || 0;
-
-            // Calculate the Net value
             const net = out - buyIn;
-
-            // Update the Net span
-            row.children[4].textContent = "$"+ net.toFixed(2);
+            row.children[4].textContent = "$" + net.toFixed(2);
         }
-        function checkAndGenerateVenmoLinks() {
-            // Get the current URL parameters
-            const params = new URLSearchParams(window.location.search);
 
-            // Extract trade details from the URL
+        function checkAndGenerateVenmoLinks() {
+            const params = new URLSearchParams(window.location.search);
             const trades = [];
             for (const [key, value] of params.entries()) {
-            const match = key.match(/^(from|fromUsername|to|toUsername|amount)(\d+)$/);
-            if (match) {
-                const index = parseInt(match[2], 10);
-                if (!trades[index]) trades[index] = {};
-                trades[index][match[1]] = decodeURIComponent(value);
+                const match = key.match(/^(from|fromUsername|to|toUsername|amount)(\d+)$/);
+                if (match) {
+                    const index = parseInt(match[2], 10);
+                    if (!trades[index]) trades[index] = {};
+                    trades[index][match[1]] = decodeURIComponent(value);
+                }
             }
-            }
-
-            // If no trades are found, return
             if (trades.length === 0) return;
 
             console.log(trades);
             document.getElementById('ledger-container').style.display = 'none';
+
             const instructions = document.createElement('p');
-            instructions.innerHTML = "Click the button(s) <strong>with your name</strong> below to pay directly though Venmo. You can also copy the URL to share it with others.";
+            instructions.id = 'instructions';
+            instructions.innerHTML = "Click the button(s) <strong>with your name</strong> below to <strong>pay</strong> directly through Venmo. You can also copy the URL to share it with others.";
 
-            // Group trades by payer username
-            const groupedTrades = trades.reduce((acc, trade) => {
-            if (!acc[trade.fromUsername]) acc[trade.fromUsername] = [];
-            acc[trade.fromUsername].push(trade);
-            return acc;
-            }, {});
+            const toggleButton = document.createElement('button');
+            toggleButton.className = 'btn btn-secondary mt-3 w-100';
+            toggleButton.textContent = 'Switch to Request Mode';
+            toggleButton.onclick = () => {
+                const isPayMode = toggleButton.textContent.includes('Request');
+                toggleButton.textContent = isPayMode ? 'Switch to Pay Mode' : 'Switch to Request Mode';
+                instructions.innerHTML = `Click the button(s) <strong>with your name</strong> below to <strong>${isPayMode ? 'request' : 'pay'}</strong> directly through Venmo. You can also copy the URL to share it with others.`;
+                generateVenmoButtons(trades, !isPayMode);
+            };
 
-            // Create a single container for all Venmo buttons
             const buttonContainer = document.createElement('div');
             buttonContainer.className = 'd-grid gap-2';
+            buttonContainer.id = 'venmo-buttons';
 
-            // Generate Venmo buttons
+            const main = document.querySelector('main');
+            main.appendChild(instructions);
+            main.appendChild(buttonContainer);
+            generateVenmoButtons(trades, true);
+            main.appendChild(toggleButton);
+        }
+
+        function generateVenmoButtons(trades, isPayMode) {
+            const buttonContainer = document.getElementById('venmo-buttons');
+            buttonContainer.innerHTML = '';
+
+            const groupedTrades = trades.reduce((acc, trade) => {
+                const key = isPayMode ? trade.fromUsername : trade.toUsername;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(trade);
+                return acc;
+            }, {});
+
             Object.values(groupedTrades).forEach(tradeGroup => {
-            tradeGroup.forEach((trade, index) => {
-                const venmoLink = `https://venmo.com/?txn=pay&audience=private&recipients=${encodeURIComponent(trade.toUsername)}&amount=${trade.amount}&note=Pizza`;
-                const link = document.createElement('a');
-                link.href = venmoLink;
-                link.target = '_blank';
-                link.className = 'text-decoration-none';
+                tradeGroup.forEach((trade, index) => {
+                    const venmoLink = `https://venmo.com/?txn=${isPayMode ? 'pay' : 'charge'}&audience=private&recipients=${encodeURIComponent(isPayMode ? trade.toUsername : trade.fromUsername)}&amount=${trade.amount}&note=Pizza`;
+                    const link = document.createElement('a');
+                    link.href = venmoLink;
+                    link.target = '_blank';
+                    link.className = 'text-decoration-none';
 
-                const button = document.createElement('button');
-                button.className = 'btn btn-lg btn-outline-primary w-100';
-                button.type = 'button';
-                button.textContent = `${trade.from} ${tradeGroup.length > 1 ? `(${index + 1} of ${tradeGroup.length})` : ''}`;
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-lg btn-outline-primary w-100';
+                    button.type = 'button';
+                    button.textContent = isPayMode
+                        ? `${trade.from} ${tradeGroup.length > 1 ? `(${index + 1} of ${tradeGroup.length})` : ''}`
+                        : `${trade.to} ${tradeGroup.length > 1 ? `(${index + 1} of ${tradeGroup.length})` : ''}`;
 
-                // Append the button to the link
-                link.appendChild(button);
-
-                // Append the link to the container
-                buttonContainer.appendChild(link);
+                    link.appendChild(button);
+                    buttonContainer.appendChild(link);
+                });
             });
-            });
-            
-            // Add a reset button
+
             const resetButton = document.createElement('button');
             resetButton.className = 'btn btn-danger mt-3 w-100';
             resetButton.textContent = 'Reset';
             resetButton.onclick = () => {
                 window.location.href = window.location.origin + window.location.pathname;
             };
-
-            
-            
-            // Append the container to the main section
-            const main = document.querySelector('main');
-            
-            main.appendChild(instructions);
-            main.appendChild(buttonContainer);
-            // Append the reset button to the main section
-            main.appendChild(resetButton);
+            buttonContainer.appendChild(resetButton);
         }
 
-        // Call the function on page load
         checkAndGenerateVenmoLinks();
-        function VenmoGenerate() {
-            // Get all rows in the ledger
-            const rows = document.querySelectorAll('#ledger .row');
 
-            // Initialize arrays to store the details
+        function VenmoGenerate() {
+            const rows = document.querySelectorAll('#ledger .row');
             const details = [];
             const balances = [];
 
-            // Loop through each row and extract the details
             rows.forEach(row => {
-            const name = row.children[0].value.trim() || '';
-            const username = row.children[1].value.replace('@','').trim() || '';
-            const buyIn = parseFloat(row.children[2].value) || 0;
-            const out = parseFloat(row.children[3].value) || 0;
-            const net = out - buyIn;
+                const name = row.children[0].value.trim() || '';
+                const username = row.children[1].value.replace('@', '').trim() || '';
+                const buyIn = parseFloat(row.children[2].value) || 0;
+                const out = parseFloat(row.children[3].value) || 0;
+                const net = out - buyIn;
 
-            // Add the details to the array
-            if (name || username || buyIn || out) {
-                details.push({ name, username, net });
-                balances.push(net);
-            }
+                if (name || username || buyIn || out) {
+                    details.push({ name, username, net });
+                    balances.push(net);
+                }
             });
 
-            // Ensure the sum of all nets is 0
             const totalNet = balances.reduce((sum, net) => sum + net, 0);
             if (Math.abs(totalNet) > 0.01) {
-            alert("The total net is not zero. Please check your inputs.");
-            return;
+                alert("The total net is not zero. Please check your inputs.");
+                return;
             }
 
-            // Separate positive and negative balances
             const creditors = details.filter(d => d.net > 0).sort((a, b) => b.net - a.net);
             const debtors = details.filter(d => d.net < 0).sort((a, b) => a.net - b.net);
 
             const trades = [];
-
-            // Compute the minimum trades
             while (creditors.length > 0 && debtors.length > 0) {
-            const creditor = creditors[0];
-            const debtor = debtors[0];
+                const creditor = creditors[0];
+                const debtor = debtors[0];
+                const amount = Math.min(creditor.net, -debtor.net);
 
-            const amount = Math.min(creditor.net, -debtor.net);
+                trades.push({
+                    from: debtor.name,
+                    fromUsername: debtor.username,
+                    to: creditor.name,
+                    toUsername: creditor.username,
+                    amount: amount.toFixed(2)
+                });
 
-            trades.push({
-                from: debtor.name,
-                fromUsername: debtor.username,
-                to: creditor.name,
-                toUsername: creditor.username,
-                amount: amount.toFixed(2)
-            });
+                creditor.net -= amount;
+                debtor.net += amount;
 
-            // Update balances
-            creditor.net -= amount;
-            debtor.net += amount;
-
-            // Remove settled creditors or debtors
-            if (creditor.net === 0) creditors.shift();
-            if (debtor.net === 0) debtors.shift();
+                if (creditor.net === 0) creditors.shift();
+                if (debtor.net === 0) debtors.shift();
             }
 
-            // Generate the URL string with unique parameter keys
-            const tradeDetails = trades.map((trade, index) => 
-            `from${index}=${encodeURIComponent(trade.from)}&fromUsername${index}=${encodeURIComponent(trade.fromUsername)}&to${index}=${encodeURIComponent(trade.to)}&toUsername${index}=${encodeURIComponent(trade.toUsername)}&amount${index}=${trade.amount}`
+            const tradeDetails = trades.map((trade, index) =>
+                `from${index}=${encodeURIComponent(trade.from)}&fromUsername${index}=${encodeURIComponent(trade.fromUsername)}&to${index}=${encodeURIComponent(trade.to)}&toUsername${index}=${encodeURIComponent(trade.toUsername)}&amount${index}=${trade.amount}`
             ).join('&');
 
             const url = `https://alexejero.me/venmo-ledger?${tradeDetails}`;
 
-            // Display the URL (or you can copy it to the clipboard)
-            
-            // Copy URL to clipboard
             navigator.clipboard.writeText(url).then(() => {
-            console.log('URL copied to clipboard!');
-            alert("Link Copied to Clipboard! Click OK to redirect.");
+                console.log('URL copied to clipboard!');
+                alert("Link Copied to Clipboard! Click OK to redirect.");
                 window.location.href = url;
             }).catch(err => {
-            console.error('Could not copy URL: ', err);
+                console.error('Could not copy URL: ', err);
             });
         }
     </script>
