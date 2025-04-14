@@ -16,21 +16,27 @@
     <main>
         <div id="ledger">
             <div class="row p-3">
-                <input type="text" class="col-3" placeholder="Name"><input type="text" class="col-3" placeholder="Venmo Username"><input type="number" class="col" placeholder="Buy In" oninput="updateNet(this)"> <input type="number" class="col" placeholder="Out" oninput="updateNet(this)"><span class="col">$0.00</span>
+                <input type="text" class="col-3" placeholder="Name">
+                <input type="text" class="col-3" placeholder="Venmo Username">
+                <input type="number" class="col" placeholder="Buy In" oninput="updateNet(this)">
+                <input type="number" class="col" placeholder="Out" oninput="updateNet(this)">
+                <span class="col">$0.00</span>
             </div>
         </div>
         <div class="row p-3">
-            <button class="btn btn-dark col-auto" onclick="VenmoAdd()" >➕</button>
+            <button class="btn btn-dark col-auto" onclick="VenmoAdd()" ><b>+</b></button>
         </div>
         <div class="row p-3">
             <button class="btn btn-dark col-auto" onclick="VenmoGenerate()" >Generate</button>
         </div>
+        
 
         
 
     </main>
     <footer>
         <p>&copy; 2025 Alex Jerome</p>
+        <p>We do not track your pizza parties with analytics, cookies, or anything.</p>
     </footer>
     <script>
 
@@ -104,13 +110,21 @@
             Object.values(groupedTrades).forEach(tradeGroup => {
             tradeGroup.forEach((trade, index) => {
                 const venmoLink = `https://venmo.com/?txn=pay&audience=private&recipients=${encodeURIComponent(trade.toUsername)}&amount=${trade.amount}&note=Pizza`;
-                const button = document.createElement('button');
-                button.className = 'btn btn-lg btn-outline-primary';
-                button.type = 'button';
-                button.innerHTML = `<a href="${venmoLink}" target="_blank" class="text-decoration-none">${trade.from} ${tradeGroup.length > 1 ? `(${index + 1} of ${tradeGroup.length})` : ''}</a>`;
+                const link = document.createElement('a');
+                link.href = venmoLink;
+                link.target = '_blank';
+                link.className = 'text-decoration-none';
 
-                // Append the button to the container
-                buttonContainer.appendChild(button);
+                const button = document.createElement('button');
+                button.className = 'btn btn-lg btn-outline-primary w-100';
+                button.type = 'button';
+                button.textContent = `${trade.from} ${tradeGroup.length > 1 ? `(${index + 1} of ${tradeGroup.length})` : ''}`;
+
+                // Append the button to the link
+                link.appendChild(button);
+
+                // Append the link to the container
+                buttonContainer.appendChild(link);
             });
             });
 
@@ -131,8 +145,8 @@
 
             // Loop through each row and extract the details
             rows.forEach(row => {
-            const name = row.children[0].value || '';
-            const username = row.children[1].value || '';
+            const name = row.children[0].value.trim() || '';
+            const username = row.children[1].value.replace('@','').trim() || '';
             const buyIn = parseFloat(row.children[2].value) || 0;
             const out = parseFloat(row.children[3].value) || 0;
             const net = out - buyIn;
