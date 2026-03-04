@@ -170,7 +170,7 @@
 
             const totalNet = balances.reduce((sum, net) => sum + net, 0);
             if (Math.abs(totalNet) > 0.01) {
-                alert("The total net is $"+ String(totalNet) +". Please check your inputs.");
+                alert("The total net is $"+ totalNet.toFixed(2) +". Please check your inputs.");
                 return;
             }
 
