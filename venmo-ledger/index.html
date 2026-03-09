@@ -95,6 +95,7 @@
                 toggleButton.textContent = isPayMode ? 'Switch to Pay Mode' : 'Switch to Request Mode';
                 instructions.innerHTML = `Click the button(s) <strong>with your name</strong> below to <strong>${isPayMode ? 'request' : 'pay'}</strong> directly through Venmo. You can also copy the URL to share it with others.`;
                 generateVenmoButtons(trades, !isPayMode);
+                refreshTextLedger(trades, !isPayMode);
             };
 
             const buttonContainer = document.createElement('div');
@@ -106,6 +107,9 @@
             main.appendChild(buttonContainer);
             generateVenmoButtons(trades, true);
             main.appendChild(toggleButton);
+
+            const textLedgerToggleBtn = generateTextLedgerToggle(trades, () => toggleButton.textContent.includes('Request'));
+            main.appendChild(textLedgerToggleBtn);
         }
 
         function generateVenmoButtons(trades, isPayMode) {
@@ -146,6 +150,43 @@
                 window.location.href = window.location.origin + window.location.pathname;
             };
             buttonContainer.appendChild(resetButton);
+        }
+
+        function generateTextLedgerToggle(trades, isPayModeGetter) {
+            const textLedgerDiv = document.createElement('div');
+            textLedgerDiv.id = 'text-ledger';
+            textLedgerDiv.className = 'mt-3';
+            textLedgerDiv.style.display = 'none';
+            document.body.insertBefore(textLedgerDiv, document.querySelector('footer'));
+
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'btn btn-secondary mt-3 w-100';
+            toggleBtn.textContent = 'Toggle Text Trades Ledger';
+            toggleBtn.onclick = () => {
+                if (trades.length === 0) return;
+                const isVisible = textLedgerDiv.style.display !== 'none';
+                if (isVisible) {
+                    textLedgerDiv.style.display = 'none';
+                } else {
+                    textLedgerDiv.style.display = '';
+                    refreshTextLedger(trades, isPayModeGetter());
+                }
+            };
+
+            return toggleBtn;
+        }
+
+        function refreshTextLedger(trades, isPayMode) {
+            const div = document.getElementById('text-ledger');
+            if (!div || div.style.display === 'none') return;
+            div.innerHTML = '';
+            trades.forEach(trade => {
+                const p = document.createElement('p');
+                p.textContent = isPayMode
+                    ? `${trade.from} (@${trade.fromUsername}) pays $${trade.amount} to ${trade.to} (@${trade.toUsername})`
+                    : `${trade.to} (@${trade.toUsername}) receives $${trade.amount} from ${trade.from} (@${trade.fromUsername})`;
+                div.appendChild(p);
+            });
         }
 
         checkAndGenerateVenmoLinks();
